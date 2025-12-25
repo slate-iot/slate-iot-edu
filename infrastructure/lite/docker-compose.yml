@@ -1,0 +1,39 @@
+version: '3.8'
+
+# ==============================================================================
+# SLATE v2.1 - LITE EDITION
+# Description: Minimal resource stack (Mosquitto + Node-RED)
+# RAM Usage: ~200MB (vs 1GB for Full Stack)
+# ==============================================================================
+
+services:
+  # 1. THE BROKER (Same as Full Stack)
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: mosquitto
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      # We reuse the main configs so rules are consistent
+      - ../config/mosquitto:/mosquitto/config
+      - mosquitto_data:/mosquitto/data
+      - mosquitto_log:/mosquitto/log
+
+  # 2. THE VISUALIZER (Node-RED replaces Telegraf+Influx+Grafana)
+  nodered:
+    image: nodered/node-red:latest
+    container_name: nodered
+    ports:
+      - "1880:1880"
+    environment:
+      - TZ=Europe/Bucharest # Set to your local time
+    volumes:
+      - node_red_data:/data
+    depends_on:
+      - mosquitto
+
+volumes:
+  mosquitto_data:
+  mosquitto_log:
+  node_red_data:

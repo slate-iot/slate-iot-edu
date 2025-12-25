@@ -1,0 +1,42 @@
+apiVersion: 1
+
+# ==============================================================================
+# SLATE v2.1 DATASOURCE CONFIGURATION
+# ------------------------------------------------------------------------------
+# This file tells Grafana: "Here is where the data lives."
+# It connects the Visualizer (Grafana) to the Database (InfluxDB).
+# ==============================================================================
+
+datasources:
+  - name: Slate_Freezer_DB
+
+    # THE DRIVER
+    # We are using InfluxDB (Version 1.8 compatibility mode)
+    type: influxdb
+
+    # ACCESS MODE
+    # "proxy" means the Grafana Container talks to the InfluxDB Container directly
+    # inside the Docker network.
+    # Note: If you used "browser", the student's laptop would try to find the DB,
+    # which often fails due to firewall/CORS issues.
+    access: proxy
+
+    # THE ADDRESS
+    # We use "http://influxdb:8086" because inside Docker,
+    # the service name acts as the hostname.
+    url: http://influxdb:8086
+
+    # CREDENTIALS
+    # These MUST match the environment variables set in docker-compose.yml
+    database: slate_freezer_v2
+    user: admin
+
+    # SECURITY
+    # The password is kept in this secure block so it isn't exposed in the UI.
+    secureJsonData:
+      password: slate_admin
+
+    # UX IMPROVEMENT
+    # "isDefault: true" means when a student creates a new graph,
+    # this database is already selected. They don't have to search for it.
+    isDefault: true

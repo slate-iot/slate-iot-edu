@@ -1,0 +1,127 @@
+version: '3.8'
+
+# ==============================================================================
+# SLATE v2.1 LOCAL CLOUD INFRASTRUCTURE
+# ------------------------------------------------------------------------------
+# This file tells Docker to spin up 4 "Virtual Machines" (Containers) that
+# work together to receive, store, and visualize your IoT data.
+#
+# THE PIPELINE:
+# [ESP32] --(MQTT)--> [Mosquitto] --(Telegraf)--> [InfluxDB] --(Read)--> [Grafana]
+# ==============================================================================
+
+services:
+
+  # ----------------------------------------------------------------------------
+  # 1. THE "POST OFFICE" (MQTT Broker)
+  # Role: Receives messages from your hardware and sorts them.
+  # ----------------------------------------------------------------------------
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: slate_v2_broker
+    restart: unless-stopped  # If it crashes, restart it automatically
+    
+    # THE "DOORS" (Port Mapping)
+    # Format: "Laptop_Port : Container_Port"
+    ports:
+      - "1883:1883"  # Standard MQTT (Used by ESP32)
+      - "9001:9001"  # WebSockets (Used by Web Apps)
+    
+    # THE "HARD DRIVE" (Volumes)
+    # Maps a folder inside the container to your local disk so settings aren't lost.
+    volumes:
+      - ./config/mosquitto:/mosquitto/config
+      - mosquitto_data:/mosquitto/data
+    
+    networks:
+      - slate_net
+
+  # ----------------------------------------------------------------------------
+  # 2. THE "TRANSLATOR" (Telegraf)
+  # Role: Listens to the Post Office, converts JSON data, and files it in the DB.
+  # Note: This has no ports because it works silently in the background.
+  # ----------------------------------------------------------------------------
+  telegraf:
+    image: telegraf:latest
+    container_name: slate_v2_bridge
+    restart: unless-stopped
+    
+    # CONFIGURATION
+    # We mount the config file read-only (:ro) so the container can't break it.
+    volumes:
+      - ./config/telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    
+    # STARTUP ORDER
+    # Only start this AFTER the Broker and Database are ready.
+    depends_on:
+      - mosquitto
+      - influxdb
+    
+    networks:
+      - slate_net
+
+  # ----------------------------------------------------------------------------
+  # 3. THE "FILING CABINET" (InfluxDB)
+  # Role: A high-speed Time-Series Database optimized for sensor data.
+  # ----------------------------------------------------------------------------
+  influxdb:
+    image: influxdb:1.8
+    container_name: slate_v2_db
+    restart: unless-stopped
+    ports:
+      - "8086:8086" # HTTP API Port
+    
+    # PERSISTENCE
+    # This volume ensures your temperature history isn't deleted when you turn off Docker.
+    volumes:
+      - influxdb_data:/var/lib/influxdb
+    
+    # DEFAULT CREDENTIALS (Variables)
+    environment:
+      - INFLUXDB_DB=slate_freezer_v2
+      - INFLUXDB_ADMIN_USER=admin
+      - INFLUXDB_ADMIN_PASSWORD=slate_admin
+    
+    networks:
+      - slate_net
+
+  # ----------------------------------------------------------------------------
+  # 4. THE "MONITOR" (Grafana)
+  # Role: The website where you view graphs and gauges.
+  # ----------------------------------------------------------------------------
+  grafana:
+    image: grafana/grafana:latest
+    container_name: slate_v2_dashboard
+    restart: unless-stopped
+    ports:
+      - "3000:3000" # Access this at http://localhost:3000
+    
+    volumes:
+      - grafana_data:/var/lib/grafana
+      # AUTOMATION MAGIC:
+      # This mapping loads our Pre-Made Dashboards automatically on startup.
+      - ./config/grafana/provisioning:/etc/grafana/provisioning
+    
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=slate
+      - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-worldmap-panel
+    
+    depends_on:
+      - influxdb
+    
+    networks:
+      - slate_net
+
+# ==============================================================================
+# SYSTEM INTERNALS (Do Not Touch)
+# Defines the shared storage and private network for these containers.
+# ==============================================================================
+volumes:
+  mosquitto_data:
+  influxdb_data:
+  grafana_data:
+
+networks:
+  slate_net:
+    driver: bridge

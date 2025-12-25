@@ -1,0 +1,13 @@
+[wokwi]
+version = 1
+generatedBy = 'vscode'
+
+# 1. THE FIRMWARE
+# Where PlatformIO saves the compiled code.
+# We point to the ELF file so debugging (stepping through code) works.
+firmware = 'labs/02_Cold_Chain_Sensing/.pio/build/esp32dev/firmware.elf'
+elf = 'labs/02_Cold_Chain_Sensing/.pio/build/esp32dev/firmware.elf'
+
+# 2. THE HARDWARE
+# Where we saved the "Black & Gold" wiring diagram.
+diagram = 'simulation/diagram.json'

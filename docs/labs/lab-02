@@ -1,0 +1,58 @@
+---
+sidebar_position: 2
+id: lab-02
+title: ❄️ Lab 02: Cold Chain Monitoring
+sidebar_label: Lab 02 - Freezer Monitor
+---
+
+**Objective:** Build an Industrial IoT Freezer Monitor compliant with FDA Safety Standards.
+
+---
+
+## 1. The Engineering Scenario
+
+You have been hired by a pharmaceutical logistics company. They transport sensitive vaccines that must stay frozen between **-30°C and -10°C**.
+
+:::tip 📚 Theory Check
+Do you understand **FDA 21 CFR Part 11** regulations?
+[**Read the Safety Standards Article**](https://your-bookstack-url.com/books/safety-standards) on BookStack before continuing.
+:::
+
+**Your Mission:**
+
+1.  Connect a BME280 sensor to the Slate v2.1 Node.
+2.  Program the node to publish via MQTT.
+3.  Visualize the "Safe Zones" on Grafana.
+
+---
+
+## 2. Hardware Setup (I2C)
+
+We use the I2C protocol because it is digital and precise.
+
+- **SDA (Data):** GPIO 21
+- **SCL (Clock):** GPIO 22
+
+:::info 📚 Theory Check
+How does I2C addressing work? Why do we need pull-up resistors?
+[**Read the I2C Deep Dive**](https://your-bookstack-url.com/books/protocols/page/i2c-explained) on BookStack.
+:::
+
+---
+
+## 3. The Code Logic
+
+Your firmware needs to read the sensor every 5 seconds.
+
+```cpp
+// Hint: Use the Adafruit_BME280 library
+if (now - lastMsg > 5000) {
+    float temp = bme.readTemperature();
+    // TODO: Publish this to MQTT...
+}
+```
+
+:::warning 🎓 Student Exercise
+The code above is incomplete. You must implement the MQTT publish function.
+**Instructors:** The full solution code is available in the [**Educator Portal**](https://your-bookstack-url.com/books/instructor-resources).
+:::

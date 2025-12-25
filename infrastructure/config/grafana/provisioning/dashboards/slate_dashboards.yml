@@ -1,0 +1,42 @@
+apiVersion: 1
+
+# ==============================================================================
+# SLATE v2.1 DASHBOARD LOADER
+# ------------------------------------------------------------------------------
+# This file acts as the bridge between your JSON file and the Grafana UI.
+# It tells Grafana where to look for dashboards and how to handle them.
+# ==============================================================================
+
+providers:
+  - name: "Slate Freezer V2.1"
+
+    # 1. ORGANIZATION
+    # Instead of dumping everything in "General", we create a dedicated
+    # folder in the Grafana sidebar named "Slate IoT Labs".
+    folder: "Slate IoT Labs"
+
+    # 2. SOURCE TYPE
+    # We are loading from a local 'file', not a database.
+    type: file
+
+    # 3. STUDENT SAFETY NETS
+    # disableDeletion: Can they delete the dashboard from the UI?
+    # We set 'false' so they can clean up if they want, but the file remains on disk.
+    disableDeletion: false
+
+    # allowUiUpdates: Can they click "Save" in the web interface?
+    # We set 'true' so they can drag widgets around and save their layout
+    # without getting a "Provisioning Error".
+    allowUiUpdates: true
+
+    # 4. HOT RELOADING
+    # How often Grafana checks the file for changes.
+    # Benefit: You can edit 'Freezer_Dashboard.json' in VS Code, press Save,
+    # and the browser updates 10 seconds later without restarting Docker.
+    updateIntervalSeconds: 10
+
+    options:
+      # THE PATH
+      # This MUST match the volume path defined in docker-compose.yml.
+      # Inside the container, we mounted our ./dashboards folder to here:
+      path: /etc/grafana/provisioning/dashboards

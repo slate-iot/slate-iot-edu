@@ -1,0 +1,103 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		// =========================================================
+		// 1. VISUAL NOISE REDUCTION (Focus on the Code)
+		// =========================================================
+		
+		// Hides the small "code map" on the right side.
+		// Reason: It takes up space and is confusing for short scripts.
+		"editor.minimap.enabled": false,
+
+		// Hides the "Open Editors" list in the sidebar.
+		// Reason: Students confuse this with the actual file browser.
+		"explorer.openEditors.visible": 0,
+
+		// Shows the README.md every time they open the project.
+		// Reason: Ensures they always see the "How-To" guide first.
+		"workbench.startupEditor": "readme",
+
+		// Disables the "Did you know?" popups from VS Code.
+		"workbench.tips.enabled": false,
+
+		// Hides complex build folders from the sidebar so students don't break them.
+		"files.exclude": {
+			"**/.git": true,           // Hides version control internals
+			"**/.ds_store": true,      // Hides Mac junk files
+			"**/.pio": true,           // Hides PlatformIO build artifacts (Heavy junk)
+			"**/node_modules": true,   // Hides Simulation libraries
+			"**/.vscode": false        // KEEP FALSE: We need them to see tasks.json
+		},
+
+		// =========================================================
+		// 2. SAFETY NETS (Preventing common errors)
+		// =========================================================
+
+		// Automatically saves the file when they click the terminal or switch tabs.
+		// Reason: Prevents "I uploaded code but nothing changed" because they forgot to save.
+		"files.autoSave": "onFocusChange",
+
+		// Automatically formats code (fixes indentation) when saving.
+		// Reason: Teaches them to look at clean, professional code structures.
+		"editor.formatOnSave": true,
+
+		// Keeps more history in the terminal window.
+		// Reason: Essential for scrolling back to see error messages.
+		"terminal.integrated.scrollback": 10000,
+
+		// =========================================================
+		// 3. PLATFORMIO TWEAKS (The IoT Engine)
+		// =========================================================
+
+		// Stops PlatformIO from opening the slow "Home" screen on startup.
+		// Reason: Get straight to the code.
+		"platformio-ide.showHomeOnStartup": false,
+
+		// =========================================================
+		// 4. INTELLIGENT FORMATTING (Industrial Standards)
+		// =========================================================
+
+		// Forces Google Style formatting for C++ (Standard in IoT).
+		"C_Cpp.clang_format_fallbackStyle": "{ BasedOnStyle: Google, IndentWidth: 4, ColumnLimit: 100 }",
+
+		// Tells VS Code how to treat specific file extensions.
+		"files.associations": {
+			"*.h": "cpp",         // Treat headers as C++
+			"*.c": "cpp",         // Treat C files as C++
+			"*.ino": "cpp",       // Treat Arduino files as C++
+			"*.conf": "properties" // Treat config files as readable properties
+		},
+
+		// Ensures we use the right formatter for the right job.
+		"[json]": {
+			"editor.defaultFormatter": "esbenp.prettier-vscode"
+		},
+		"[yaml]": {
+			"editor.defaultFormatter": "esbenp.prettier-vscode"
+		},
+		"[cpp]": {
+			"editor.defaultFormatter": "ms-vscode.cpptools"
+		}
+	},
+	"extensions": {
+		// =========================================================
+		// 5. THE TOOLCHAIN (Auto-Installation)
+		// =========================================================
+		"recommendations": [
+			// THE FIRMWARE STACK
+			"platformio.platformio-ide",  // 1. The Compiler (Builds the code)
+			"ms-vscode.cpptools",         // 2. The Brains (Auto-complete & Go to Definition)
+			
+			// THE SIMULATION STACK
+			"wokwi.wokwi-vscode",         // 3. The Digital Twin (Test without hardware)
+			
+			// THE HELPER STACK
+			"esbenp.prettier-vscode",     // 4. The Beautifier (Formats JSON/YAML)
+			"mechatroner.rainbow-csv"     // 5. The Analyst (Colorizes CSV data logs)
+		]
+	}
+}
